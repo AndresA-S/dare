@@ -1,0 +1,6 @@
+name=dare
+author=Michelle Paradis and Joaquin Ackland-Snow
+description=The new way to end anxiety and stop panic attacks.
+bundleID=com.michellejoaquin.dare
+version=1.0
+imagePath=SystemAssets
