@@ -6,28 +6,39 @@ import 'backgroundBar'
 import 'dynamicText'
 import 'progressBar'
 import 'tasks'
+import 'shaker'
 
 
 
 local barMaxWidth, barRadius <const> = 170, 4
 
-local store         		<const> = playdate.datastore.read()
-local timer         		<const> = playdate.timer
-local minorFontName 		<const> = 'Roobert-11-Medium'
-local majorFontName 		<const> = 'Roobert-24-Medium'
-local taskLabel     		<const> = DynamicText(0, 0, minorFontName, 'left')
-local infoLabel     		<const> = DynamicText(400, 0, minorFontName, 'right')
-local instructionLabel		<const> = DynamicText (120, 155, minorFontName, 'centre')
+
+local store         <const> = playdate.datastore.read()
+local timer         <const> = playdate.timer
+local minorFontName <const> = 'Roobert-11-Medium'
+local majorFontName <const> = 'Roobert-24-Medium'
+local taskLabel     <const> = DynamicText(0, 0, minorFontName, 'left')
+local infoLabel     <const> = DynamicText(400, 0, minorFontName, 'right')
+local instructionLabel <const> = DynamicText(200, 200, minorFontName, 'center')
+local instructionLabel1 <const> = DynamicText (120, 155, minorFontName, 'centre')
+
 local instructionLabel2		<const> = DynamicText (120, 185, minorFontName, 'centre')
-local instructionLabel3		<const> = DynamicText (200, 200, minorFontName, 'centre') 
-local instruction   		<const> = DynamicText(200, 120, majorFontName, 'center')
-local backgroundBar 		<const> = BackgroundBar(115, 120 + 22, barMaxWidth, barRadius)
-local progressBar   		<const> = ProgressBar(115, 120 + 22, 0, barRadius)
+local instruction   <const> = DynamicText(200, 120, majorFontName, 'center')
+local backgroundBar <const> = BackgroundBar(115, 120 + 22, barMaxWidth, barRadius)
+local progressBar   <const> = ProgressBar(115, 120 + 22, 0, barRadius)
+
 
 local numOfTicks = 0
 local crankMovement = true
 local randomNum = 10
 
+local player <const> = playdate.sound.sampleplayer
+
+local shaker = Shaker.new(function()
+	print("THE PLAYDATE IS SHOOK!!")
+ end, {sensitivity = Shaker.kSensitivityHigh, threshold = 0.5, samples = 40})
+ 
+shaker:setEnabled(true)
 
 App = {}
 
@@ -42,8 +53,8 @@ local function refreshLabels()
 	taskLabel:setContent(App.actualTask['name'])
 	infoLabel:setContent(App.actualTask['info'])
 	instructionLabel:setContent(nil)
+	instructionLabel1:setContent(nil)
 	instructionLabel2:setContent(nil)
-	instructionLabel3:setContent(nil)
 end
 
 local function resetTimer()
@@ -56,10 +67,6 @@ local function resetTimer()
 	App.timer = timer.new(i.time, 0, barMaxWidth)
 end
 
-local function changeInstruction()
-	App.instructionCursor = App.instructionCursor % #App.actualTask.instructions + 1
-end
-
 -- public methods:
 
 function App:setup()
@@ -69,12 +76,15 @@ function App:setup()
 end
 
 function App:run()
+	sprite.update()
 
 	sprite.update()
 	timer.updateTimers()
 
 
 	if self.actualTask['name'] == 'Diffuse' then
+		local sound = player.new('Sounds/diffuse')
+
 		
 		-- 'instructionCursor' points to the current 'instruction' in the 'task'
 		--local currentInstruction = self.actualTask.instructions[self.instructionCursor]
@@ -84,7 +94,7 @@ function App:run()
         --    instruction:setContent(currentInstruction.name)
         --end
 
-		instructionLabel:setContent("Ⓐ  No, it doesn't!")
+		instructionLabel1:setContent("Ⓐ  No, it doesn't!")
 		instructionLabel2:setContent("Ⓑ  It definitely does not!")
 
 
@@ -92,17 +102,27 @@ function App:run()
 		progressBar:setVisible(false)
         backgroundBar:setVisible(false)
 
+		function playdate.AButtonDown()
+
+			App:changeTask()
+		end
+
+		function playdate.BButtonDown()
+
+			App:changeTask()
+		end
+
 	elseif self.actualTask['name'] == 'Engage' then
 
 			if randomNum <= 0 then
-				instructionLabel3:setContent(nil)
+				instructionLabel:setContent(nil)
 				App:changeTask()
 			end
 
 			if crankMovement == true and randomNum > 0 then
-				instructionLabel3:setContent("Clockwise!")
+				instructionLabel:setContent("Clockwise!")
 			elseif crankMovement == false and randomNum > 0 then
-				instructionLabel3:setContent("Counter-clockwise!")
+				instructionLabel:setContent("Counter-clockwise!")
 			end
 
 		-- Sets the width of the progress bar to zero to not display it 
@@ -144,25 +164,46 @@ function App:run()
 			randomNum -=2
 
 			if crankMovement == false and randomNum > 0 then
-				instructionLabel3:setContent("Counter-clockwise!")
+				instructionLabel:setContent("Counter-clockwise!")
 			elseif crankMovement == true and randomNum > 0 then
-				instructionLabel3:setContent("Clockwise!")
+				instructionLabel:setContent("Clockwise!")
 			end
 		end
 
-
-
-	else
-		-- Display and update the progress bar for other tasks
-		progressBar:setVisible(true)
-        backgroundBar:setVisible(true)
-		progressBar:setWidth(self.timer.value)
-
 	end
 
-	if self.timer.timeLeft == 0 then
-		changeInstruction()
-		resetTimer()
+	if App.actualTask.name == 'Allow' then
+
+		local sound = player.new('Sounds/allow')
+
+		progressBar:setVisible(true)
+		backgroundBar:setVisible(true)
+		instructionLabel:setContent('"I accept and allow this anxious feeling"')
+
+		progressBar:setWidth(self.timer.value)
+
+		if self.timer.timeLeft == 0 then
+			sound:play()
+
+			resetTimer()
+			App:changeTask()
+		end
+	
+		timer.updateTimers()
+	end
+	if App.actualTask.name == 'Reframe' then
+		progressBar:setVisible(false)
+		backgroundBar:setVisible(false)
+		instructionLabel:setContent(shaker:numOfShakes())
+
+		playdate.startAccelerometer()
+
+		shaker:update()
+
+		if shaker:numOfShakes() >= 5 then
+			App:changeTask()
+			Shaker:resetShakes()
+		end
 	end
 end
 
@@ -173,8 +214,4 @@ function App:changeTask()
 
 	refreshLabels()
 	resetTimer()
-end
-
-function App:write()
-	playdate.datastore.write({ taskCursor = self.taskCursor })
 end
