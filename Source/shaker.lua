@@ -3,7 +3,6 @@ local STANDARD_GRAVITY <const> = 9.80665
 local shakes = 0
 
 local player <const> = playdate.sound.sampleplayer
-local sound = player.new('Sounds/reframe')
 
 
 Shaker = {}
@@ -95,7 +94,6 @@ end
 function Shaker:test()
 	local average = self.shake_sample_total / #self.shake_samples
 	if average > self.threshold then
-		sound:play()
 		shakes += 1
 		self:reset()
 		self.callback()

@@ -1,10 +1,10 @@
 tasks = {
 	{
-		name = 'Diffuse',
+		name = 'Defuse',
 		info = 'So what?',
 		instructions = {
 			{
-				name = 'Does this feeling matter?',
+				name = 'Can this feeling hurt me?',
 				time = 10000
 			},
 		}
@@ -14,7 +14,7 @@ tasks = {
 		info = 'I accept this feeling.',
 		instructions = {
 			{
-				name = 'Repeat the phrase',
+				name = 'Repeat the phrase.',
 				time = 10000
 			},
 		}
@@ -35,7 +35,7 @@ tasks = {
 		instructions = {
 			{
 				name = 'Turn the crank!',
-				time = 10000
+				time = 0
 			},
 		}
 	},

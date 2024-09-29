@@ -42,7 +42,7 @@ shaker:setEnabled(true)
 
 App = {}
 
-App.taskCursor        = store and store.taskCursor or 1
+App.taskCursor        = 1
 App.instructionCursor = 1
 App.actualTask        = tasks[App.taskCursor]
 App.timer             = nil
@@ -76,14 +76,17 @@ function App:setup()
 end
 
 function App:run()
-	sprite.update()
+	print('appname')
+	print(App.actualTask.name)
+
+	print('appindex')
+	print(App.taskCursor)
 
 	sprite.update()
 	timer.updateTimers()
 
 
-	if self.actualTask['name'] == 'Diffuse' then
-		local sound = player.new('Sounds/diffuse')
+	if App.actualTask.name == 'Defuse' then
 
 		
 		-- 'instructionCursor' points to the current 'instruction' in the 'task'
@@ -94,8 +97,8 @@ function App:run()
         --    instruction:setContent(currentInstruction.name)
         --end
 
-		instructionLabel1:setContent("Ⓐ  No, it doesn't!")
-		instructionLabel2:setContent("Ⓑ  It definitely does not!")
+		instructionLabel1:setContent("Ⓐ  No, it can't!")
+		instructionLabel2:setContent("Ⓑ  It definitely can not!")
 
 
 		-- Sets the width of the progress bar to zero to not display it 
@@ -112,7 +115,8 @@ function App:run()
 			App:changeTask()
 		end
 
-	elseif self.actualTask['name'] == 'Engage' then
+	end
+	if App.actualTask.name == 'Engage' then
 
 			if randomNum <= 0 then
 				instructionLabel:setContent(nil)
@@ -174,16 +178,14 @@ function App:run()
 
 	if App.actualTask.name == 'Allow' then
 
-		local sound = player.new('Sounds/allow')
 
 		progressBar:setVisible(true)
 		backgroundBar:setVisible(true)
-		instructionLabel:setContent('"I accept and allow this anxious feeling"')
+		instructionLabel:setContent('"I accept and allow this anxious feeling."')
 
 		progressBar:setWidth(self.timer.value)
 
 		if self.timer.timeLeft == 0 then
-			sound:play()
 
 			resetTimer()
 			App:changeTask()
