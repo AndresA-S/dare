@@ -23,7 +23,7 @@ function DynamicText:init(x, y, font, alignment)
 end
 
 function DynamicText:setContent(content)
-	self.content = content or ""
+	self.content = content or ''
 
 	self:markDirty()
 	self:setSize(self.font:getTextWidth(self.content), self.font:getHeight())

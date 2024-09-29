@@ -3,7 +3,7 @@ local STANDARD_GRAVITY <const> = 9.80665
 local shakes = 0
 
 local player <const> = playdate.sound.sampleplayer
-local sound = player.new('Sounds/ding')
+local sound = player.new('Sounds/reframe')
 
 
 Shaker = {}

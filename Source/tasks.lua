@@ -4,7 +4,7 @@ tasks = {
 		info = 'So what?',
 		instructions = {
 			{
-				name = 'Breathe in',
+				name = 'Does this feeling matter?',
 				time = 10000
 			},
 		}
@@ -15,7 +15,7 @@ tasks = {
 		instructions = {
 			{
 				name = 'Repeat the phrase',
-				time = 30000
+				time = 10000
 			},
 		}
 	},
@@ -34,7 +34,7 @@ tasks = {
 		info = 'I\'m engaging in an activity.',
 		instructions = {
 			{
-				name = 'Breathe in',
+				name = 'Turn the crank!',
 				time = 10000
 			},
 		}

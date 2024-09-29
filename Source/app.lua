@@ -15,9 +15,13 @@ local majorFontName <const> = 'Roobert-24-Medium'
 local taskLabel     <const> = DynamicText(0, 0, minorFontName, 'left')
 local infoLabel     <const> = DynamicText(400, 0, minorFontName, 'right')
 local instructionLabel <const> = DynamicText(200, 200, minorFontName, 'center')
+local instructionLabel1 <const> = DynamicText (120, 155, minorFontName, 'centre')
+
+local instructionLabel2		<const> = DynamicText (120, 185, minorFontName, 'centre')
 local instruction   <const> = DynamicText(200, 120, majorFontName, 'center')
 local backgroundBar <const> = BackgroundBar(115, 120 + 22, barMaxWidth, barRadius)
 local progressBar   <const> = ProgressBar(115, 120 + 22, 0, barRadius)
+
 local player <const> = playdate.sound.sampleplayer
 
 local shaker = Shaker.new(function()
@@ -39,6 +43,8 @@ local function refreshLabels()
 	taskLabel:setContent(App.actualTask['name'])
 	infoLabel:setContent(App.actualTask['info'])
 	instructionLabel:setContent(nil)
+	instructionLabel1:setContent(nil)
+	instructionLabel2:setContent(nil)
 end
 
 local function resetTimer()
@@ -62,11 +68,48 @@ end
 function App:run()
 	sprite.update()
 
-	if App.actualTask.name == 'Diffuse' or App.actualTask.name == 'Engage' then
+	if self.actualTask['name'] == 'Diffuse' then
+		local sound = player.new('Sounds/diffuse')
+
+		
+		-- 'instructionCursor' points to the current 'instruction' in the 'task'
+		local currentInstruction = self.actualTask.instructions[self.instructionCursor]
+
+        if currentInstruction then
+            -- Display the 'name' of the 'instruction' from the 'Diffuse' task on the screen
+            instruction:setContent(currentInstruction.name)
+        end
+
+		instructionLabel1:setContent("Ⓐ  No, it doesn't!")
+		instructionLabel2:setContent("Ⓑ  It definitely does not!")
+
+
+		-- Sets the width of the progress bar to zero to not display it 
+		progressBar:setVisible(false)
+        backgroundBar:setVisible(false)
+
+		function playdate.AButtonDown()
+			sound:play()
+
+			App:changeTask()
+		end
+
+		function playdate.AButtonDown()
+			sound:play()
+
+			App:changeTask()
+		end
+
+
+	end
+
+	if App.actualTask.name == 'Engage' then
 		App:changeTask()
 	end
 
 	if App.actualTask.name == 'Allow' then
+
+		local sound = player.new('Sounds/allow')
 
 		progressBar:setVisible(true)
 		backgroundBar:setVisible(true)
@@ -75,6 +118,8 @@ function App:run()
 		progressBar:setWidth(self.timer.value)
 
 		if self.timer.timeLeft == 0 then
+			sound:play()
+
 			resetTimer()
 			App:changeTask()
 		end
@@ -90,7 +135,7 @@ function App:run()
 
 		shaker:update()
 
-		if shaker:numOfShakes() >= 10 then
+		if shaker:numOfShakes() >= 5 then
 			App:changeTask()
 			Shaker:resetShakes()
 		end
