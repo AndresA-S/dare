@@ -3,8 +3,8 @@ import 'CoreLibs/timer'
 import 'backgroundBar'
 import 'dynamicText'
 import 'progressBar'
-import 'soundManager'
 import 'tasks'
+import 'shaker'
 
 local barMaxWidth, barRadius <const> = 170, 4
 
@@ -14,9 +14,17 @@ local minorFontName <const> = 'Roobert-11-Medium'
 local majorFontName <const> = 'Roobert-24-Medium'
 local taskLabel     <const> = DynamicText(0, 0, minorFontName, 'left')
 local infoLabel     <const> = DynamicText(400, 0, minorFontName, 'right')
+local instructionLabel <const> = DynamicText(200, 200, minorFontName, 'center')
 local instruction   <const> = DynamicText(200, 120, majorFontName, 'center')
 local backgroundBar <const> = BackgroundBar(115, 120 + 22, barMaxWidth, barRadius)
 local progressBar   <const> = ProgressBar(115, 120 + 22, 0, barRadius)
+local player <const> = playdate.sound.sampleplayer
+
+local shaker = Shaker.new(function()
+	print("THE PLAYDATE IS SHOOK!!")
+ end, {sensitivity = Shaker.kSensitivityHigh, threshold = 0.5, samples = 40})
+ 
+shaker:setEnabled(true)
 
 App = {}
 
@@ -30,6 +38,7 @@ App.timer             = nil
 local function refreshLabels()
 	taskLabel:setContent(App.actualTask['name'])
 	infoLabel:setContent(App.actualTask['info'])
+	instructionLabel:setContent(nil)
 end
 
 local function resetTimer()
@@ -39,12 +48,7 @@ local function resetTimer()
 
 	local i = App.actualTask.instructions[App.instructionCursor]
 	instruction:setContent(i.name)
-	SoundManager:play(i.name)
 	App.timer = timer.new(i.time, 0, barMaxWidth)
-end
-
-local function changeInstruction()
-	App.instructionCursor = App.instructionCursor % #App.actualTask.instructions + 1
 end
 
 -- public methods:
@@ -56,15 +60,41 @@ function App:setup()
 end
 
 function App:run()
-	progressBar:setWidth(self.timer.value)
+	sprite.update()
 
-	if self.timer.timeLeft == 0 then
-		changeInstruction()
-		resetTimer()
+	if App.actualTask.name == 'Diffuse' or App.actualTask.name == 'Engage' then
+		App:changeTask()
 	end
 
-	sprite.update()
-	timer.updateTimers()
+	if App.actualTask.name == 'Allow' then
+
+		progressBar:setVisible(true)
+		backgroundBar:setVisible(true)
+		instructionLabel:setContent('"I accept and allow this anxious feeling"')
+
+		progressBar:setWidth(self.timer.value)
+
+		if self.timer.timeLeft == 0 then
+			resetTimer()
+			App:changeTask()
+		end
+	
+		timer.updateTimers()
+	end
+	if App.actualTask.name == 'Reframe' then
+		progressBar:setVisible(false)
+		backgroundBar:setVisible(false)
+		instructionLabel:setContent(shaker:numOfShakes())
+
+		playdate.startAccelerometer()
+
+		shaker:update()
+
+		if shaker:numOfShakes() >= 10 then
+			App:changeTask()
+			Shaker:resetShakes()
+		end
+	end
 end
 
 function App:changeTask()
@@ -74,8 +104,4 @@ function App:changeTask()
 
 	refreshLabels()
 	resetTimer()
-end
-
-function App:write()
-	playdate.datastore.write({ taskCursor = self.taskCursor })
 end

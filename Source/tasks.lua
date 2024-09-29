@@ -11,11 +11,11 @@ tasks = {
 	},
 	{
 		name = 'Allow',
-		info = 'I allow this feeling.',
+		info = 'I accept this feeling.',
 		instructions = {
 			{
-				name = 'Breathe in',
-				time = 10000
+				name = 'Repeat the phrase',
+				time = 30000
 			},
 		}
 	},
@@ -24,8 +24,8 @@ tasks = {
 		info = 'I\'m excited by this feeling!',
 		instructions = {
 			{
-				name = 'Breathe in',
-				time = 10000
+				name = 'Shake the device!',
+				time = 0
 			},
 		}
 	},
